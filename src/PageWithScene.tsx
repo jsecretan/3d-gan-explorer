@@ -7,15 +7,19 @@ class PageWithScene extends React.Component<{}, {}> {
   onSceneMount = (e: SceneEventArgs) => {
     const { canvas, scene, engine } = e;
 
-        // This creates and positions a free camera (non-mesh)
-        //const camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
-        var camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(0, 0, -10), scene);
-
-        // This targets the camera to scene origin
-        //camera.setTarget(BABYLON.Vector3.Zero());
-
-        // This attaches the camera to the canvas
-        camera.attachControl(canvas, true);
+        // Got the snippet from here: https://playground.babylonjs.com/#K9MWF6#3
+        var camera = new BABYLON.ArcRotateCamera('camera', -Math.PI / 2, Math.PI / 2, 10, new BABYLON.Vector3(0, 0, -10), scene);
+        camera.attachControl(canvas, true, false, 1);
+        camera.attachControl(canvas, true, false);
+        camera.panningAxis = new BABYLON.Vector3(1, 1, 0);
+        camera.upperBetaLimit = Math.PI / 2;
+        camera.wheelPrecision = 1;
+        camera.panningSensibility = 100;
+        camera.inertia = 0.1;
+        camera.panningInertia = 0.8;
+        camera._panningMouseButton = 0; // change functionality from left to right mouse button
+        camera.angularSensibilityX = 500;
+        camera.angularSensibilityY = 500;
 
         // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
         const light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
