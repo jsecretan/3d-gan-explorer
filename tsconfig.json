@@ -19,7 +19,8 @@
     "strictPropertyInitialization": false,
     "strictNullChecks": false,
     "noEmit": true,
-    "jsx": "react"
+    "jsx": "react",
+    "noImplicitThis": false
   },
   "include": [
     "src"
