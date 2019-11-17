@@ -8,6 +8,8 @@ import trimesh
 import io
 import random
 from mesh_utility import decimate
+from zipfile import ZipFile
+import timeit
 
 class GANGenerator:
 
@@ -82,9 +84,7 @@ class GANGenerator:
         z_sample = np.random.normal(0, object_space_value, size=[self.batch_size, self.z_size]).astype(np.float32)
         g_objects = self.sess.run(self.net_g_test,feed_dict={self.z_vector:z_sample})
         id_ch = np.random.randint(0, self.batch_size, 4)
-        for i in range(4):
-            if g_objects[id_ch[i]].max() > 0.5:
-                voxels = np.squeeze(g_objects[id_ch[i]]>0.5)
+        voxels = np.squeeze(g_objects[0]>0.5)
         vertices, faces, normals, values = sk.marching_cubes_lewiner(voxels, level=0.5)
 
         return vertices, faces, normals, values
@@ -116,9 +116,65 @@ class GANGenerator:
         reduced_mesh = decimate(largest_component)
 
         if extension == "stl":
-            return trimesh.exchange.stl.export_stl_ascii(largest_component)
+            return trimesh.exchange.stl.export_stl_ascii(reduced_mesh)
         else:
-            return trimesh.exchange.wavefront.export_wavefront(largest_component)
-        
+            return trimesh.exchange.wavefront.export_wavefront(reduced_mesh)
+
+
+#     def generate_multiple_objects(self, object_space):
+#         z_sample = np.random.normal(0, object_space, size=[self.batch_size, self.z_size]).astype(np.float32)
+#         g_objects = self.sess.run(self.net_g_test,feed_dict={self.z_vector:z_sample})
+#         total_mesh_data_size = 0
+# #        buff = io.BytesIO()
+# #        zip = ZipFile(buff, mode='w')
+#         for i in range(self.batch_size):
+#             voxels = np.squeeze(g_objects[i]>0.5)
+#             vertices, faces, normals, values = sk.marching_cubes_lewiner(voxels, level=0.5)
+            
+#             mesh = trimesh.base.Trimesh(vertices = vertices, faces = faces)
+
+#             # Remove artifacts by getting the largest component
+#             components = mesh.split()
+
+#             # TODO, there should be a way of making this more efficient
+#             largest_component = components[0]
+
+#             most_vertices = len(largest_component.vertices)
+#             for component in components:
+#                 if len(component.vertices) > most_vertices:
+#                     largest_component = component
+#                     most_vertices = len(component.vertices)
+
+#             largest_component.vertices -= largest_component.centroid
+#             largest_component.vertices /= 10.0
+
+#             trimesh.repair.fill_holes(largest_component)
+#             trimesh.smoothing.filter_taubin(largest_component,iterations=10)
+
+#             reduced_mesh = decimate(largest_component)
+
+# #            zip.writestr(str(i)+".obj",trimesh.exchange.wavefront.export_wavefront(reduced_mesh))
+
+
+#             with open(str(i)+".obj", "w") as file:
+#                 #mesh_data = trimesh.exchange.wavefront.export_wavefront(largest_component)
+#                 mesh_data = trimesh.exchange.wavefront.export_wavefront(reduced_mesh)
+#                 total_mesh_data_size += len(mesh_data)
+#                 file.write(mesh_data)
+
+#         #print("Object size is %f" % (total_mesh_data_size/self.batch_size))
+# #        zip.close()
+# #        return buff.getvalue()
+
+
+# if __name__ == "__main__":
+#     g = GANGenerator("biasfree_998.cptk")
+#     def run_request_test():
+#         g.generate_multiple_objects(0.5123)
+    
+#     total_time = timeit.timeit(run_request_test, number=1)
+
+#     print("On average objects took %f to compute" % (total_time/g.batch_size))
+
 
 
