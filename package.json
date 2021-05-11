@@ -8,7 +8,7 @@
     "babylonjs-loaders": "^3.3.0",
     "babylonjs-serializers": "^4.0.3",
     "hilbert-curve": "^1.1.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "lodash.product": "^18.9.19",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
